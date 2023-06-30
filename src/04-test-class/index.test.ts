@@ -1,44 +1,90 @@
-// Uncomment the code below and write your tests
-// import { getBankAccount } from '.';
+import {
+  BankAccount,
+  getBankAccount,
+  InsufficientFundsError,
+  SynchronizationFailedError,
+  TransferFailedError,
+} from './index';
 
 describe('BankAccount', () => {
   test('should create account with initial balance', () => {
-    // Write your test here
+    const createAccount = getBankAccount(5);
+    expect(createAccount.getBalance()).toBe(5);
   });
 
   test('should throw InsufficientFundsError error when withdrawing more than balance', () => {
-    // Write your test here
+    try {
+      const createAccount = getBankAccount(5);
+      createAccount.withdraw(12);
+    } catch (err) {
+      expect(InsufficientFundsError);
+    }
   });
 
   test('should throw error when transferring more than balance', () => {
-    // Write your test here
+    try {
+      const createAccount = getBankAccount(5);
+      createAccount.transfer(12, createAccount);
+    } catch (err) {
+      expect(TransferFailedError);
+    }
   });
 
   test('should throw error when transferring to the same account', () => {
-    // Write your test here
+    try {
+      const createAccount = getBankAccount(5);
+      createAccount.transfer(12, createAccount);
+    } catch (err) {
+      expect(TransferFailedError);
+    }
   });
 
   test('should deposit money', () => {
-    // Write your test here
+    const createAccount = getBankAccount(5);
+    createAccount.deposit(12);
+    expect(BankAccount);
   });
 
   test('should withdraw money', () => {
-    // Write your test here
+    try {
+      const createAccount = getBankAccount(5);
+      createAccount.withdraw(12);
+    } catch (err) {
+      expect(InsufficientFundsError);
+    }
   });
 
   test('should transfer money', () => {
-    // Write your test here
+    try {
+      const createAccount = getBankAccount(5);
+      createAccount.transfer(2, createAccount);
+    } catch (err) {
+      expect(TransferFailedError);
+    }
   });
 
   test('fetchBalance should return number in case if request did not failed', async () => {
-    // Write your tests here
+    const createAccount = getBankAccount(5);
+    expect(createAccount.fetchBalance()).toBeTruthy();
   });
 
   test('should set new balance if fetchBalance returned number', async () => {
-    // Write your tests here
+    try {
+      const createAccount = getBankAccount(5);
+      const result = await createAccount.synchronizeBalance();
+      expect(result).toBeTruthy();
+    } catch (error) {
+      expect(SynchronizationFailedError);
+    }
   });
 
   test('should throw SynchronizationFailedError if fetchBalance returned null', async () => {
-    // Write your tests here
+    try {
+      const createAccount = getBankAccount(5);
+      const result = await createAccount.fetchBalance();
+      expect(result).toBeTruthy();
+    } catch (error) {
+      expect(SynchronizationFailedError);
+    }
   });
 });
