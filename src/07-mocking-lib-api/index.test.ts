@@ -2,9 +2,13 @@ import axios from 'axios';
 import { throttledGetDataFromApi } from './index';
 
 describe('throttledGetDataFromApi', () => {
-  afterAll(() => jest.useRealTimers());
+  beforeAll(() => {
+    jest.useFakeTimers();
+  });
 
-  beforeAll(() => jest.useFakeTimers());
+  afterAll(() => {
+    jest.useRealTimers();
+  });
 
   test('should create instance with provided base url', async () => {
     jest
