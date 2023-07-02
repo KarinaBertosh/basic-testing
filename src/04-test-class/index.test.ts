@@ -1,10 +1,4 @@
-import {
-  BankAccount,
-  getBankAccount,
-  InsufficientFundsError,
-  SynchronizationFailedError,
-  TransferFailedError,
-} from './index';
+import { getBankAccount } from './index';
 
 describe('BankAccount', () => {
   test('should create account with initial balance', () => {
@@ -13,11 +7,14 @@ describe('BankAccount', () => {
   });
 
   test('should throw InsufficientFundsError error when withdrawing more than balance', () => {
+    const balance = 5;
     try {
-      const createAccount = getBankAccount(5);
+      const createAccount = getBankAccount(balance);
       createAccount.withdraw(12);
     } catch (err) {
-      expect(InsufficientFundsError);
+      expect((err as Error).message).toBe(
+        `Insufficient funds: cannot withdraw more than ${balance}`,
+      );
     }
   });
 
@@ -26,7 +23,7 @@ describe('BankAccount', () => {
       const createAccount = getBankAccount(5);
       createAccount.transfer(12, createAccount);
     } catch (err) {
-      expect(TransferFailedError);
+      expect((err as Error).message).toBe('Transfer failed');
     }
   });
 
@@ -35,32 +32,27 @@ describe('BankAccount', () => {
       const createAccount = getBankAccount(5);
       createAccount.transfer(12, createAccount);
     } catch (err) {
-      expect(TransferFailedError);
+      expect((err as Error).message).toBe('Transfer failed');
     }
   });
 
   test('should deposit money', () => {
     const createAccount = getBankAccount(5);
     createAccount.deposit(12);
-    expect(BankAccount);
+    expect(createAccount.getBalance()).toBe(17);
   });
 
   test('should withdraw money', () => {
-    try {
-      const createAccount = getBankAccount(5);
-      createAccount.withdraw(12);
-    } catch (err) {
-      expect(InsufficientFundsError);
-    }
+    const createAccount = getBankAccount(50);
+    createAccount.withdraw(12);
+    expect(createAccount.getBalance()).toBe(38);
   });
 
   test('should transfer money', () => {
-    try {
-      const createAccount = getBankAccount(5);
-      createAccount.transfer(2, createAccount);
-    } catch (err) {
-      expect(TransferFailedError);
-    }
+    const createAccount = getBankAccount(5);
+    const newBankAccount = getBankAccount(200);
+    createAccount.transfer(2, newBankAccount);
+    expect(newBankAccount).toHaveProperty('_balance', 202);
   });
 
   test('fetchBalance should return number in case if request did not failed', async () => {
@@ -69,22 +61,27 @@ describe('BankAccount', () => {
   });
 
   test('should set new balance if fetchBalance returned number', async () => {
+    const balance = 5;
+    const newBalance = 50;
+    const createAccount = getBankAccount(balance);
     try {
-      const createAccount = getBankAccount(5);
-      const result = await createAccount.synchronizeBalance();
-      expect(result).toBeTruthy();
+      jest
+        .spyOn(createAccount, 'fetchBalance')
+        .mockResolvedValueOnce(newBalance);
+      await createAccount.synchronizeBalance();
+      expect(createAccount.getBalance()).toEqual(newBalance);
     } catch (error) {
-      expect(SynchronizationFailedError);
+      expect((error as Error).message).toBe('Synchronization failed');
     }
   });
 
   test('should throw SynchronizationFailedError if fetchBalance returned null', async () => {
+    const balance = 5;
+    const createAccount = getBankAccount(balance);
     try {
-      const createAccount = getBankAccount(5);
-      const result = await createAccount.fetchBalance();
-      expect(result).toBeTruthy();
+      await createAccount.synchronizeBalance();
     } catch (error) {
-      expect(SynchronizationFailedError);
+      expect((error as Error).message).toBe('Synchronization failed');
     }
   });
 });

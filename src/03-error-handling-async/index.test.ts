@@ -18,7 +18,7 @@ describe('throwError', () => {
     try {
       await throwError('Hello');
     } catch (error) {
-      expect(error);
+      expect((error as Error).message).toBe('Hello');
     }
   });
 
@@ -26,23 +26,19 @@ describe('throwError', () => {
     try {
       await throwError();
     } catch (error) {
-      expect(error);
+      expect((error as Error).message).toBe('Oops!');
     }
   });
 });
 
 describe('throwCustomError', () => {
   test('should throw custom error', async () => {
-    try {
-      await throwCustomError();
-    } catch (error) {
-      expect(MyAwesomeError);
-    }
+    expect(() => throwCustomError()).toThrow(MyAwesomeError);
   });
 });
 
 describe('rejectCustomError', () => {
   test('should reject custom error', async () => {
-    return expect(rejectCustomError()).rejects.toThrow(MyAwesomeError);
+    expect(rejectCustomError()).rejects.toThrow(MyAwesomeError);
   });
 });
